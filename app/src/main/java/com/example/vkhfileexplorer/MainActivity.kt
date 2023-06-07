@@ -1,10 +1,16 @@
 package com.example.vkhfileexplorer
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.vkhfileexplorer.Utils.Companion.isDirectory
@@ -18,12 +24,15 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     private val adapter = FileItemAdapter(this)
     private lateinit var layout: View
     private var currentPath: String = ""
+    private lateinit var pLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         layout = binding.mainLayout
         setContentView(binding.root)
+        registerPermissionListener()
+        checkPermission()
         init()
     }
 
@@ -75,6 +84,36 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
             return
         }
         super.onBackPressed()
+    }
+
+    private fun checkPermission() {
+        if (Environment.isExternalStorageManager()) {
+            Toast.makeText(this, "Разрешение на чтение файлов имеется", Toast.LENGTH_SHORT).show()
+        } else {
+            try {
+                val pName = applicationContext.packageName
+                var intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.setData(Uri.parse("package:${pName}"))
+                pLauncher.launch(intent)
+            } catch (ex: Exception) {
+                Log.w("PERMISSION", "exception ${ex.localizedMessage}")
+                var intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                pLauncher.launch(intent)
+            }
+        }
+
+    }
+
+    private fun registerPermissionListener() {
+        pLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (Environment.isExternalStorageManager()) {
+                Toast.makeText(this, "Разрешение на чтение файлов имеется", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Нет разрешения на доступ к файлам", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 }
