@@ -34,7 +34,12 @@ class Utils {
         }
 
         fun listFiles(path: String): List<String> {
-            return File(path).listFiles()?.map { it.absolutePath }?.toList() ?: emptyList()
+            return File(path).listFiles()
+                ?.toList()
+                ?.sortedBy { -1 * it.lastModified() }
+                ?.map { it.absolutePath }
+                ?.toList()
+                ?: emptyList()
         }
     }
 }
