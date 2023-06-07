@@ -3,12 +3,14 @@ package com.example.vkhfileexplorer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.example.vkhfileexplorer.Utils.Companion.extension
+import com.example.vkhfileexplorer.Utils.Companion.isDirectory
+import com.example.vkhfileexplorer.Utils.Companion.isImage
+import com.example.vkhfileexplorer.Utils.Companion.name
+import com.example.vkhfileexplorer.Utils.Companion.uri
 import com.example.vkhfileexplorer.databinding.FileItemBinding
-import java.io.File
 
 class FileItemAdapter(val listener: ClickListener) : RecyclerView.Adapter<FileItemAdapter.FileItemHolder>() {
 
@@ -18,23 +20,33 @@ class FileItemAdapter(val listener: ClickListener) : RecyclerView.Adapter<FileIt
         private val binding = FileItemBinding.bind(item)
         fun bind(fileItem: FileItem, listener: ClickListener) = with(binding) {
             setImage(im, fileItem.fileName)
-            tvTitle.text = File(fileItem.fileName).name
+            tvTitle.text = name(fileItem.fileName)
             itemView.setOnClickListener {
                 listener.onClick(fileItem)
             }
         }
 
         private fun setImage(im: ImageView?, fileName: String) {
-            val ext = File(fileName).extension
-            val mimeType: String = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext).toString()
-            if (mimeType.startsWith("image/")) {
-                im?.setImageURI(File(fileName).toUri())
-            } else {
-                var ico = binding.root.resources.getIdentifier(ext, "drawable", binding.root.context.packageName)
-                if (ico == 0) {
-                    ico = R.drawable._blank
+            when {
+                isImage(fileName) -> {
+                    im?.setImageURI(uri(fileName))
                 }
-                im?.setImageResource(ico)
+
+                isDirectory(fileName) -> {
+                    im?.setImageResource(R.drawable.ic_folder)
+                }
+
+                else -> {
+                    var ico = binding.root.resources.getIdentifier(
+                        extension(fileName),
+                        "drawable",
+                        binding.root.context.packageName
+                    )
+                    if (ico == 0) {
+                        ico = R.drawable._blank
+                    }
+                    im?.setImageResource(ico)
+                }
             }
         }
 

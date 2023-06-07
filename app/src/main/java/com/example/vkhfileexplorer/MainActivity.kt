@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.vkhfileexplorer.Utils.Companion.isDirectory
+import com.example.vkhfileexplorer.Utils.Companion.isImage
+import com.example.vkhfileexplorer.Utils.Companion.listFiles
+import com.example.vkhfileexplorer.Utils.Companion.parent
 import com.example.vkhfileexplorer.databinding.ActivityMainBinding
-import java.io.File
 
 class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     private lateinit var binding: ActivityMainBinding
@@ -32,34 +34,36 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     }
 
     private fun navigateTo(path: String) {
-        adapter.resetFiles()
-        val dir = File(path).listFiles()
-        for (file in dir!!) {
-            adapter.addFile(FileItem(file.absolutePath))
-        }
-        adapter.update()
+        if (isDirectory(path)) {
+            adapter.resetFiles()
+            val dir = listFiles(path)
+            for (file in dir) adapter.addFile(FileItem(file))
+            adapter.update()
 
-        supportActionBar?.apply {
-            subtitle = path.substringAfter(Environment.getExternalStorageDirectory().absolutePath)
-            setHomeButtonEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
-            setDisplayHomeAsUpEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+            supportActionBar?.apply {
+                subtitle = path.substringAfter(Environment.getExternalStorageDirectory().absolutePath)
+                setHomeButtonEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+                setDisplayHomeAsUpEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+            }
+            currentPath = path
         }
-        currentPath = path;
     }
 
     override fun onClick(fileItem: FileItem) {
-        if (File(fileItem.fileName).isDirectory) {
+        if (isDirectory(fileItem.fileName)) {
             navigateTo(fileItem.fileName)
         } else {
-            startActivity(Intent(this, ContentActivity::class.java).apply {
-                putExtra("fileItem", fileItem.fileName)
-            })
+            if (isImage(fileItem.fileName)) {
+                startActivity(Intent(this, ContentActivity::class.java).apply {
+                    putExtra("fileItem", fileItem.fileName)
+                })
+            }
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == resources.getIdentifier("home", "id", "android")) {
-            navigateTo(File(currentPath).parentFile.absolutePath)
+            navigateTo(parent(currentPath))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -67,7 +71,7 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
 
     override fun onBackPressed() {
         if (currentPath != Environment.getExternalStorageDirectory().absolutePath) {
-            navigateTo(File(currentPath).parentFile.absolutePath)
+            navigateTo(parent(currentPath))
             return
         }
         super.onBackPressed()
