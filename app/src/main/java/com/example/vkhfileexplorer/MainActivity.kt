@@ -3,6 +3,7 @@ package com.example.vkhfileexplorer
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     private lateinit var binding: ActivityMainBinding
     private val adapter = FileItemAdapter(this)
     private lateinit var layout: View
+    private var currentPath: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,10 +28,6 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     private fun init() {
         binding.rcView.layoutManager = LinearLayoutManager(this)
         binding.rcView.adapter = adapter
-        supportActionBar?.apply {
-            subtitle = ""
-        }
-
         navigateTo(Environment.getExternalStorageDirectory().absolutePath)
     }
 
@@ -40,7 +38,13 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
             adapter.addFile(FileItem(file.absolutePath))
         }
         adapter.update()
-        Toast.makeText(this, "Привет!", Toast.LENGTH_LONG).show()
+
+        supportActionBar?.apply {
+            subtitle = path.substringAfter(Environment.getExternalStorageDirectory().absolutePath)
+            setHomeButtonEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+            setDisplayHomeAsUpEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+        }
+        currentPath = path;
     }
 
     override fun onClick(fileItem: FileItem) {
@@ -51,6 +55,22 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
                 putExtra("fileItem", fileItem.fileName)
             })
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == resources.getIdentifier("home", "id", "android")) {
+            navigateTo(File(currentPath).parentFile.absolutePath)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        if (currentPath != Environment.getExternalStorageDirectory().absolutePath) {
+            navigateTo(File(currentPath).parentFile.absolutePath)
+            return
+        }
+        super.onBackPressed()
     }
 
 }
