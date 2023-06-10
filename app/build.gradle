@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace 'com.example.vkhfileexplorer'
+    namespace 'online.begemot1k.vkhfileexplorer'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.vkhfileexplorer"
+        applicationId "online.begemot1k.vkhfileexplorer"
         minSdk 33
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 10002
+        versionName "1.0.0.02"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

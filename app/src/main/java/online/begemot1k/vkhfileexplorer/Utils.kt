@@ -1,4 +1,4 @@
-package com.example.vkhfileexplorer
+package online.begemot1k.vkhfileexplorer
 
 import android.net.Uri
 import android.webkit.MimeTypeMap

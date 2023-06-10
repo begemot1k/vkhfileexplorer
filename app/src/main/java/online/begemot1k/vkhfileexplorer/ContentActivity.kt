@@ -1,12 +1,12 @@
-package com.example.vkhfileexplorer
+package online.begemot1k.vkhfileexplorer
 
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.example.vkhfileexplorer.Utils.Companion.isImage
-import com.example.vkhfileexplorer.Utils.Companion.name
-import com.example.vkhfileexplorer.Utils.Companion.uri
-import com.example.vkhfileexplorer.databinding.ActivityContentBinding
+import online.begemot1k.vkhfileexplorer.Utils.Companion.isImage
+import online.begemot1k.vkhfileexplorer.Utils.Companion.name
+import online.begemot1k.vkhfileexplorer.Utils.Companion.uri
+import online.begemot1k.vkhfileexplorer.databinding.ActivityContentBinding
 
 class ContentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContentBinding

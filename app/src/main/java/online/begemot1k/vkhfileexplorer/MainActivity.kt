@@ -1,4 +1,4 @@
-package com.example.vkhfileexplorer
+package online.begemot1k.vkhfileexplorer
 
 import android.content.Intent
 import android.net.Uri
@@ -13,11 +13,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.vkhfileexplorer.Utils.Companion.isDirectory
-import com.example.vkhfileexplorer.Utils.Companion.isImage
-import com.example.vkhfileexplorer.Utils.Companion.listFiles
-import com.example.vkhfileexplorer.Utils.Companion.parent
-import com.example.vkhfileexplorer.databinding.ActivityMainBinding
+import online.begemot1k.vkhfileexplorer.Utils.Companion.isDirectory
+import online.begemot1k.vkhfileexplorer.Utils.Companion.isImage
+import online.begemot1k.vkhfileexplorer.Utils.Companion.listFiles
+import online.begemot1k.vkhfileexplorer.Utils.Companion.parent
+import online.begemot1k.vkhfileexplorer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     private lateinit var binding: ActivityMainBinding
