@@ -1,16 +1,17 @@
-package com.example.vkhfileexplorer
+package online.begemot1k.vkhfileexplorer
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.vkhfileexplorer.Utils.Companion.extension
-import com.example.vkhfileexplorer.Utils.Companion.isDirectory
-import com.example.vkhfileexplorer.Utils.Companion.isImage
-import com.example.vkhfileexplorer.Utils.Companion.name
-import com.example.vkhfileexplorer.Utils.Companion.uri
-import com.example.vkhfileexplorer.databinding.FileItemBinding
+import online.begemot1k.vkhfileexplorer.Utils.Companion.extension
+import online.begemot1k.vkhfileexplorer.Utils.Companion.isDirectory
+import online.begemot1k.vkhfileexplorer.Utils.Companion.isImage
+import online.begemot1k.vkhfileexplorer.Utils.Companion.name
+import online.begemot1k.vkhfileexplorer.Utils.Companion.uri
+import online.begemot1k.vkhfileexplorer.R
+import online.begemot1k.vkhfileexplorer.databinding.FileItemBinding
 
 class FileItemAdapter(val listener: ClickListener) : RecyclerView.Adapter<FileItemAdapter.FileItemHolder>() {
 
