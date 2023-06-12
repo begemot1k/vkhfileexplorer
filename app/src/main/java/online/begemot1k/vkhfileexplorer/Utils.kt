@@ -1,6 +1,7 @@
 package online.begemot1k.vkhfileexplorer
 
 import android.net.Uri
+import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import java.io.File
@@ -40,6 +41,10 @@ class Utils {
                 ?.map { it.absolutePath }
                 ?.toList()
                 ?: emptyList()
+        }
+
+        fun externalRoot(): String {
+            return Environment.getExternalStorageDirectory().absolutePath
         }
     }
 }
