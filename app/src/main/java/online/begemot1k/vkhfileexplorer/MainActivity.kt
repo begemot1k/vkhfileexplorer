@@ -1,6 +1,8 @@
 package online.begemot1k.vkhfileexplorer
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -9,10 +11,12 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import online.begemot1k.vkhfileexplorer.Utils.Companion.externalRoot
 import online.begemot1k.vkhfileexplorer.Utils.Companion.isDirectory
 import online.begemot1k.vkhfileexplorer.Utils.Companion.isImage
 import online.begemot1k.vkhfileexplorer.Utils.Companion.listFiles
@@ -20,11 +24,14 @@ import online.begemot1k.vkhfileexplorer.Utils.Companion.parent
 import online.begemot1k.vkhfileexplorer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
+    private val preferenceTable = "TABLE"
+    private val preferenceName = "path"
     private lateinit var binding: ActivityMainBinding
     private val adapter = FileItemAdapter(this)
     private lateinit var layout: View
     private var currentPath: String = ""
     private lateinit var pLauncher: ActivityResultLauncher<Intent>
+    private lateinit var preferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +44,22 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
     }
 
     private fun init() {
+        preferences = getSharedPreferences(preferenceTable, Context.MODE_PRIVATE)
+        currentPath = preferences.getString(preferenceName, externalRoot()).toString()
         binding.rcView.layoutManager = LinearLayoutManager(this)
         binding.rcView.adapter = adapter
-        navigateTo(Environment.getExternalStorageDirectory().absolutePath)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentPath != externalRoot()) {
+                    navigateTo(parent(currentPath))
+                    return
+                }
+                finish()
+            }
+        })
+
+        navigateTo(currentPath)
     }
 
     private fun navigateTo(path: String) {
@@ -50,9 +70,9 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
             adapter.update()
 
             supportActionBar?.apply {
-                subtitle = path.substringAfter(Environment.getExternalStorageDirectory().absolutePath)
-                setHomeButtonEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
-                setDisplayHomeAsUpEnabled(path != Environment.getExternalStorageDirectory().absolutePath)
+                subtitle = path.substringAfter(externalRoot())
+                setHomeButtonEnabled(path != externalRoot())
+                setDisplayHomeAsUpEnabled(path != externalRoot())
             }
             currentPath = path
         }
@@ -76,14 +96,6 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        if (currentPath != Environment.getExternalStorageDirectory().absolutePath) {
-            navigateTo(parent(currentPath))
-            return
-        }
-        super.onBackPressed()
     }
 
     private fun checkPermission() {
@@ -116,4 +128,10 @@ class MainActivity : AppCompatActivity(), FileItemAdapter.ClickListener {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        val editor = preferences.edit()
+        editor?.putString(preferenceName, currentPath)
+        editor?.apply()
+    }
 }
